@@ -1,0 +1,40 @@
+import random
+
+characters = [
+    {"name": "SpongeBob SquarePants", "questions": {"Is the character yellow?": True, "Does the character live in a pineapple?": True}},
+    {"name": "Patrick Star", "questions": {"Is the character pink?": True, "Is the character best friends with a sponge?": True}},
+    {"name": "Sandy Cheeks", "questions": {"Is the character a scientist?": True, "Does the character live in a treedome?": True}},
+]
+
+def ask_question(question):
+    while True:
+        answer = input(question + " (y/n) ").lower()
+        if answer in ["y", "n"]:
+            return answer == "y"
+        print("Invalid answer. Please enter y or n.")
+
+def play_game():
+    possible_characters = characters[:]
+    asked_questions = set()  # Track asked questions to avoid repetition
+
+    while possible_characters:
+        current_character = possible_characters[0]  # Focus on current character
+        question = random.choice(list(set(current_character["questions"].keys()) - asked_questions))  # Exclude used questions from current character
+        while question in asked_questions:  # Check for overlaps across characters
+            possible_characters.remove(current_character)  # Switch character on repeated question
+            if not possible_characters:
+                break  # No more characters, end game
+            current_character = possible_characters[0]
+            question = random.choice(list(set(current_character["questions"].keys()) - asked_questions))
+
+        asked_questions.add(question)
+
+        answer = ask_question(question)
+        possible_characters = [char for char in possible_characters if question in char["questions"] and char["questions"][question] == answer]
+
+    if len(possible_characters) == 1:
+        print("I guess you're thinking of", possible_characters[0]["name"] + "!")
+    else:
+        print("I'm not sure who you're thinking of.")
+
+play_game()
